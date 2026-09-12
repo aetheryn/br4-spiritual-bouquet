@@ -149,3 +149,5 @@ dist/
 
 .idea/
 .vscode/
+.vercel
+.env*
