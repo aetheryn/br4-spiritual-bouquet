@@ -1,9 +1,9 @@
-import TreeCanvas from "./components/TreeCanvas";
+import Tree from "./components/Tree";
 
 function App() {
   return (
     <div id="stage">
-      <TreeCanvas />
+      <Tree />
     </div>
   );
 }

@@ -1,14 +1,7 @@
 import { useEffect, useRef } from "react";
-import {
-  mulberry32,
-  generateTreeSkeleton,
-  drawTreeSkeleton,
-} from "../treeEngine";
+import { drawTree } from "../treeEngine";
 
-const DESIGN_W = 960;
-const DESIGN_H = 640;
-
-const TreeCanvas = () => {
+export default function TreeCanvas({ tree, designW, designH }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -16,14 +9,12 @@ const TreeCanvas = () => {
     const ctx = canvas.getContext("2d");
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    canvas.width = Math.round(DESIGN_W * dpr);
-    canvas.height = Math.round(DESIGN_H * dpr);
+    canvas.width = Math.round(designW * dpr);
+    canvas.height = Math.round(designH * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const rng = mulberry32(20260903); // Example seed for reproducibility
-    const skeleton = generateTreeSkeleton(rng, DESIGN_W, DESIGN_H);
-    drawTreeSkeleton(ctx, skeleton, DESIGN_H);
-  }, []);
+    drawTree(ctx, tree, designH);
+  }, [tree, designW, designH]);
 
   return (
     <canvas
@@ -37,6 +28,4 @@ const TreeCanvas = () => {
       }}
     />
   );
-};
-
-export default TreeCanvas;
+}

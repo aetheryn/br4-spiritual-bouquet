@@ -8,6 +8,81 @@ export function mulberry32(a) {
   };
 }
 
+function shuffleArr(arr, rng) {
+  for (let j = arr.length - 1; j > 0; j--) {
+    const m = Math.floor(rng() * (j + 1));
+    const tmp = arr[j];
+    arr[j] = arr[m];
+    arr[m] = tmp;
+  }
+}
+
+/*
+A small min-distance spatial hash — rejects a candidate leaf position if
+it's too close to one already placed, which is what keeps the scatter
+looking organic instead of overlapping into a mush or gridding up.
+*/
+function makeSampler(cell, minDist) {
+  const grid = {};
+  const key = (gx, gy) => `${gx},${gy}`;
+  return {
+    tooClose(px, py) {
+      const gx = Math.floor(px / cell),
+        gy = Math.floor(py / cell);
+      for (let ox = -1; ox <= 1; ox++) {
+        for (let oy = -1; oy <= 1; oy++) {
+          const arr = grid[key(gx + ox, gy + oy)];
+          if (!arr) continue;
+          for (let k = 0; k < arr.length; k++) {
+            const dx = arr[k][0] - px,
+              dy = arr[k][1] - py;
+            if (dx * dx + dy * dy < minDist * minDist) return true;
+          }
+        }
+      }
+      return false;
+    },
+    place(px, py) {
+      const gx = Math.floor(px / cell),
+        gy = Math.floor(py / cell);
+      const k = key(gx, gy);
+      if (!grid[k]) grid[k] = [];
+      grid[k].push([px, py]);
+    },
+  };
+}
+
+export const CATS = [
+  {
+    id: "masses",
+    label: "Masses",
+    singular: "Mass",
+    plural: "Masses",
+    color: "#d7a05f",
+  },
+  {
+    id: "rosaries",
+    label: "Rosaries",
+    singular: "Rosary",
+    plural: "Rosaries",
+    color: "#b9965c",
+  },
+  {
+    id: "adoration",
+    label: "Half-Hour of Adoration",
+    singular: "Half-Hour of Adoration",
+    plural: "Half-Hours of Adoration",
+    color: "#b8b05d",
+  },
+  {
+    id: "fasting",
+    label: "Day of Fasting",
+    singular: "Day of Fasting",
+    plural: "Days of Fasting",
+    color: "#7f933a",
+  },
+];
+
 export function fillTaperedPath(ctx, pts, widths, color) {
   const left = [],
     right = [];
@@ -31,20 +106,25 @@ export function fillTaperedPath(ctx, pts, widths, color) {
     left.push({ x: p.x + nx * hw, y: p.y + ny * hw });
     right.push({ x: p.x - nx * hw, y: p.y - ny * hw });
   }
+
   ctx.beginPath();
   ctx.moveTo(left[0].x, left[0].y);
+
   for (let j = 1; j < left.length; j++) ctx.lineTo(left[j].x, left[j].y);
   for (let k = right.length - 1; k >= 0; k--)
     ctx.lineTo(right[k].x, right[k].y);
+
   ctx.closePath();
   ctx.fillStyle = color;
   ctx.fill();
 }
 
 // Full Bloom's own numbers, hardcoded — the phase system arrives in a later step.
-export function generateTreeSkeleton(rng, W, H) {
+export function generateTree(rng, W, H) {
   const branches = [],
-    buds = [];
+    buds = [],
+    lobes = [],
+    leafBranches = [];
   const baseX = W * 0.5,
     baseY = H * 0.98;
   const treeScale = 0.645;
@@ -105,7 +185,10 @@ export function generateTreeSkeleton(rng, W, H) {
       y2: ey,
       len,
     };
-    if (depth !== 0) branches.push(rec);
+    if (depth !== 0) {
+      branches.push(rec);
+      leafBranches.push(rec);
+    }
     if (depth >= maxDepth || width < 2.4) {
       buds.push({ x: ex, y: ey, r: 1.3 });
       return;
@@ -150,12 +233,96 @@ export function generateTreeSkeleton(rng, W, H) {
     bd.y = stretchY(bd.y);
   });
 
-  return { trunkPts, trunkWidths, branches, buds, baseY, canopyCenterY };
+  // leafBranches shares the same object references as branches, so the
+  // vStretch above already applies to these too — nothing extra to stretch.
+  leafBranches.forEach((b) => {
+    const cxp = b.x1 + (b.x2 - b.x1) * 0.6;
+    const cyp = b.y1 + (b.y2 - b.y1) * 0.6;
+    lobes.push({ x: cxp, y: cyp, r: Math.max(13 * treeScale, b.len * 0.6) });
+  });
+
+  const sampler = makeSampler(8 * treeScale, 8.2 * treeScale);
+  let totalLen = 0;
+  leafBranches.forEach((b) => {
+    totalLen += b.len;
+  });
+
+  const target = 560; // Full Bloom's leafTarget — phase system comes later
+  const out = [];
+  let attempts = 0;
+  const maxAttempts = target * 90;
+  while (out.length < target && attempts < maxAttempts) {
+    attempts++;
+    const pick = rng() * totalLen;
+    let acc = 0;
+    let b = leafBranches[leafBranches.length - 1];
+    for (let li = 0; li < leafBranches.length; li++) {
+      acc += leafBranches[li].len;
+      if (pick <= acc) {
+        b = leafBranches[li];
+        break;
+      }
+    }
+    const tt = 0.6 + rng() * 0.4;
+    const bx = b.x1 + (b.x2 - b.x1) * tt;
+    const by = b.y1 + (b.y2 - b.y1) * tt;
+    const clusterR = (9 + tt * 18) * treeScale;
+    const ang2 = rng() * Math.PI * 2;
+    const rr = clusterR * Math.sqrt(rng());
+    const px2 = bx + Math.cos(ang2) * rr;
+    const py2 = by + Math.sin(ang2) * rr * 0.85;
+    if (py2 > H * 0.99 || py2 < H * 0.01 || px2 < W * 0.01 || px2 > W * 0.99)
+      continue;
+    if (sampler.tooClose(px2, py2)) continue;
+    sampler.place(px2, py2);
+    const outwardAngle = Math.atan2(px2 - bx, -(py2 - by));
+    out.push({
+      x: px2,
+      y: py2,
+      rot: outwardAngle + (rng() - 0.5) * 0.6,
+      scale: (1.25 + tt * 0.45 + rng() * 0.3) * 1.15,
+      shade: 0.58 + tt * 0.4 + rng() * 0.06,
+    });
+  }
+  shuffleArr(out, rng);
+  const leafSlots = out.map((slot, i) => ({
+    ...slot,
+    catId: CATS[i % CATS.length].id,
+  }));
+
+  return {
+    trunkPts,
+    trunkWidths,
+    branches,
+    buds,
+    lobes,
+    baseY,
+    canopyCenterY,
+    leafSlots,
+  };
 }
 
-export function drawTreeSkeleton(ctx, skeleton, H) {
-  const { trunkPts, trunkWidths, branches, buds, baseY, canopyCenterY } =
-    skeleton;
+export function drawTree(ctx, tree, H) {
+  const { trunkPts, trunkWidths, branches, buds, lobes, baseY, canopyCenterY } =
+    tree;
+
+  lobes.forEach((lb) => {
+    const g = ctx.createRadialGradient(
+      lb.x,
+      lb.y,
+      lb.r * 0.1,
+      lb.x,
+      lb.y,
+      lb.r,
+    );
+    g.addColorStop(0, "rgba(74,60,20,0.4)");
+    g.addColorStop(1, "rgba(74,60,20,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(lb.x, lb.y, lb.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
   const barkGradient = ctx.createLinearGradient(
     0,
     baseY,
@@ -166,6 +333,7 @@ export function drawTreeSkeleton(ctx, skeleton, H) {
   barkGradient.addColorStop(1, "#835227");
   fillTaperedPath(ctx, trunkPts, trunkWidths, barkGradient);
   branches.forEach((b) => fillTaperedPath(ctx, b.pts, b.widths, barkGradient));
+
   ctx.fillStyle = "#c98f42";
   buds.forEach((bd) => {
     ctx.beginPath();
