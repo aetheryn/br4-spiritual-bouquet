@@ -55,3 +55,17 @@ button {
   background: var(--bg);
   overflow: hidden;
 }
+
+.leaf-tooltip {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--ink);
+  box-shadow: 0 6px 16px rgba(92, 56, 15, 0.16);
+  pointer-events: none;
+  z-index: 50;
+  max-width: 220px;
+}
