@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { mulberry32, generateTree, CATS } from "../treeEngine";
 import TreeCanvas from "./TreeCanvas";
 import Leaf, { LeafGhost } from "./Leaf";
+import { usePrayerData } from "../hooks/usePrayerData";
 
 const DESIGN_W = 960;
 const DESIGN_H = 640;
@@ -20,6 +21,17 @@ export default function Tree() {
     return map;
   }, []);
 
+  const { timestampByCatIdx, loading } = usePrayerData();
+
+  const leafCatIdx = useMemo(() => {
+    const counters = {};
+    return tree.leafSlots.map((leaf) => {
+      const idx = counters[leaf.catId] ?? 0;
+      counters[leaf.catId] = idx + 1;
+      return idx;
+    });
+  }, [tree]);
+
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
   const handleHoverChange = (i, isHovered) => {
@@ -31,6 +43,17 @@ export default function Tree() {
 
   const hoveredLeaf =
     hoveredIndex !== null ? tree.leafSlots[hoveredIndex] : null;
+
+  const formatTooltip = (leaf, idx) => {
+    const timestamp = timestampByCatIdx[leaf.catId]?.[idx];
+    if (!timestamp) return null;
+    const date = new Date(timestamp).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+    return `${catById[leaf.catId].singular} added to the tree on ${date}`;
+  };
 
   return (
     <>
@@ -51,7 +74,7 @@ export default function Tree() {
             key={i}
             {...leaf}
             color={catById[leaf.catId].color}
-            tooltipLabel={`${catById[leaf.catId].singular} added to the tree on Sep 12, 2026`}
+            tooltipLabel={loading ? null : formatTooltip(leaf, leafCatIdx[i])}
             onHoverChange={(isHovered) => handleHoverChange(i, isHovered)}
           />
         ))}
