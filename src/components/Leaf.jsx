@@ -75,7 +75,7 @@ export default function Leaf({
     middleware: [offset(20), flip(), shift({ padding: 200 })],
   });
 
-  const hover = useHover(context, { delay: { open: 500, close: 0 } });
+  const hover = useHover(context, { delay: { open: 200, close: 0 } });
   const dismiss = useDismiss(context);
   const role = useRole(context, { role: "tooltip" });
 
