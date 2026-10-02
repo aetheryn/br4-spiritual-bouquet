@@ -51,9 +51,15 @@ button {
 #stage {
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   background: var(--bg);
   overflow: hidden;
+}
+
+html.drawer-open {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 .leaf-tooltip {
@@ -68,131 +74,6 @@ button {
   pointer-events: none;
   z-index: 50;
   max-width: 220px;
-}
-
-.offer-toggle {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 15;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
-  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
-  cursor: pointer;
-}
-
-.offer-drawer {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.35);
-  z-index: 100;
-}
-
-.offer-drawer form {
-  background: var(--surface);
-  border-radius: 16px 16px 0 0;
-  padding: 24px;
-  width: 100%;
-  max-width: 420px;
-}
-
-.offer-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.offer-label {
-  flex: 1;
-  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.offer-step {
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: var(--surface-raised);
-  color: var(--ink);
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.offer-count {
-  width: 72px;
-  height: 48px;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: 1.25rem;
-  font-weight: 600;
-  text-align: center;
-  appearance: none;
-}
-
-.offer-error {
-  color: #b3261e;
-  font-size: 0.95rem;
-}
-
-.offer-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.offer-actions button {
-  flex: 1;
-  height: 48px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: var(--surface-raised);
-  color: var(--ink);
-  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.offer-actions button[type="submit"] {
-  background: var(--bark);
-  border-color: var(--bark);
-  color: var(--bg);
-}
-
-.offer-actions button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.offer-honeypot {
-  position: absolute;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
 }
 
 .tree-frame {
@@ -239,110 +120,9 @@ button {
   }
 }
 
-.stage-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: clamp(22px, 4vw, 44px) clamp(24px, 4vw, 52px);
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
-  z-index: 2;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 248, 229, 0.85),
-    rgba(255, 248, 229, 0)
-  );
-}
-
-.stage-title-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.stage-eyebrow {
-  font-family: "Copper Oldstyle Italic", "EB Garamond", Georgia, serif;
-  font-style: italic;
-  font-weight: 600;
-  font-size: 0.92rem;
-  letter-spacing: 0.03em;
-  color: var(--cat-fasting);
-}
-
-.stage-title {
-  font-family: "Nadira Pro", "Fraunces", Georgia, serif;
-  font-optical-sizing: auto;
-  font-weight: 600;
-  font-size: clamp(1.5rem, 2.6vw, 2.15rem);
-  color: var(--ink);
-  margin: 0;
-  text-wrap: balance;
-}
-
-.stage-title em {
-  font-family: "Copper Oldstyle Italic", "EB Garamond", Georgia, serif;
-  font-style: italic;
-  font-weight: 500;
-  color: var(--ink-muted);
-}
-
-.stage-total {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.stage-total .label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.stage-total .value {
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-weight: 600;
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-
-.stage-legend {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 18px clamp(24px, 4vw, 52px) calc(70px + env(safe-area-inset-bottom));
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 30px;
-  align-items: center;
-  z-index: 2;
-  pointer-events: none;
-  background: linear-gradient(
-    0deg,
-    rgba(255, 248, 229, 0.92),
-    rgba(255, 248, 229, 0)
-  );
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 0.86rem;
-  color: var(--ink-muted);
-}
-
-.legend-item .swatch {
-  width: 11px;
-  height: 11px;
+.swatch {
+  width: 18px;
+  height: 18px;
   background: var(--swatch);
   border-radius: 0 60% 0 60%;
   transform: rotate(-45deg);
@@ -350,31 +130,439 @@ button {
   box-shadow: inset 0 0 0 1px rgba(59, 36, 16, 0.18);
 }
 
-.legend-item .count {
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
+/* ---------- header ---------- */
+
+.stage-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: clamp(18px, 4vw, 40px) clamp(20px, 4vw, 52px) 48px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 229, 0.96) 50%,
+    rgba(255, 248, 229, 0)
+  );
 }
 
-@media (max-width: 480px) {
-  .stage-eyebrow {
-    font-size: 1.05rem;
+.stage-title-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-eyebrow {
+  font-family: "Copper Oldstyle Italic", "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  color: var(--cat-fasting);
+}
+
+.stage-title {
+  font-family: "Nadira Pro", "Fraunces", Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-size: clamp(2rem, 7vw, 3rem);
+  line-height: 1.05;
+  color: var(--ink);
+  margin: 2px 0 0;
+}
+
+.stage-retreat {
+  font-family: "Copper Oldstyle Italic", "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.2rem;
+  color: var(--ink-muted);
+  margin-top: 4px;
+}
+
+.stage-total {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 4px 14px rgba(92, 56, 15, 0.08);
+}
+
+.stage-total .value {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-weight: 600;
+  font-size: clamp(2rem, 6vw, 2.6rem);
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.stage-total .label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---------- legend ---------- */
+
+.stage-legend {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+  padding: 56px clamp(16px, 4vw, 52px) calc(96px + env(safe-area-inset-bottom));
+  background: linear-gradient(
+    0deg,
+    rgba(255, 248, 229, 0.97) 55%,
+    rgba(255, 248, 229, 0)
+  );
+}
+
+.legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+@media (min-width: 720px) {
+  .legend-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-  .stage-title {
-    font-size: 1.85rem;
-  }
-  .stage-total .label {
-    font-size: 0.8rem;
-  }
-  .stage-total .value {
-    font-size: 2.1rem;
-  }
-  .legend-item {
-    font-size: 1.02rem;
-  }
-  .legend-item .swatch {
-    width: 13px;
-    height: 13px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(92, 56, 15, 0.06);
+}
+
+.legend-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.legend-item .count {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.legend-item .name {
+  font-size: 1rem;
+  line-height: 1.25;
+  color: var(--ink-muted);
+}
+
+/* ---------- offer button + drawer ---------- */
+
+.offer-toggle {
+  position: fixed;
+  left: 50%;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 15;
+  padding: 16px 32px;
+  border: none;
+  border-radius: 999px;
+  background: var(--bark);
+  color: var(--bg);
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(92, 56, 15, 0.35);
+  transition:
+    transform 120ms ease,
+    filter 120ms ease;
+  touch-action: manipulation;
+}
+
+.offer-toggle:hover {
+  filter: brightness(1.1);
+}
+
+.offer-toggle:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.offer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(59, 36, 16, 0.42);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 240ms ease,
+    visibility 0s linear 320ms;
+}
+
+.offer-scrim.open {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 240ms ease,
+    visibility 0s;
+}
+
+.offer-sheet {
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 22px calc(24px + env(safe-area-inset-bottom));
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -18px 40px rgba(92, 56, 15, 0.18);
+  transform: translateY(100%);
+  transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+}
+
+.offer-sheet:focus {
+  outline: none;
+}
+
+.offer-scrim.open .offer-sheet {
+  transform: translateY(0);
+}
+
+.offer-drag-zone {
+  margin: 0 -22px;
+  padding: 0 22px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.offer-grab {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 14px;
+}
+
+.offer-handle {
+  width: 44px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(107, 74, 38, 0.28);
+}
+
+.offer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.offer-eyebrow {
+  font-family: "Copper Oldstyle Italic", "EB Garamond", Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--cat-rosaries);
+}
+
+.offer-title {
+  font-family: "Nadira Pro", "Fraunces", Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-size: 1.75rem;
+  line-height: 1.15;
+  color: var(--ink);
+  margin: 2px 0 6px;
+}
+
+.offer-lede {
+  font-size: 1rem;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.offer-close {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.offer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.offer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.offer-row.active {
+  border-color: var(--swatch);
+  background: var(--surface-raised);
+}
+
+.offer-label {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.offer-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.offer-step {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.offer-step:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.offer-step:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.offer-count {
+  width: 60px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  appearance: none;
+}
+
+.offer-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.offer-error {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fdecea;
+  color: #8c1d18;
+  font-size: 0.95rem;
+}
+
+.offer-submit {
+  width: 100%;
+  height: 56px;
+  margin-top: 18px;
+  border: none;
+  border-radius: 16px;
+  background: var(--bark);
+  color: var(--bg);
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    filter 140ms ease,
+    transform 100ms ease,
+    opacity 140ms ease;
+}
+
+.offer-submit:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.offer-submit:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.offer-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offer-scrim,
+  .offer-sheet,
+  .offer-toggle,
+  .offer-row {
+    transition: none;
   }
 }
