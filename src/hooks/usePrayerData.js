@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-// Airtable field name -> catId used in treeEngine's CATS/leafSlots.
-// Double-check these against the actual `id` values in your CATS array.
 const CATEGORY_MAP = {
   mass: "masses",
   adoration: "adoration",
@@ -13,6 +11,7 @@ export function usePrayerData() {
   const [prayers, setPrayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [latestBatch, setLatestBatch] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -37,6 +36,14 @@ export function usePrayerData() {
     };
   }, []);
 
+  const addPrayer = (record) => {
+    setPrayers((prev) => [...prev, record]);
+    setLatestBatch({
+      timestamp: record.timestamp,
+      size: record.mass + record.adoration + record.rosary + record.fasting,
+    });
+  };
+
   const sorted = [...prayers].sort(
     (a, b) => new Date(a.timestamp) - new Date(b.timestamp),
   );
@@ -58,5 +65,5 @@ export function usePrayerData() {
     }
   }
 
-  return { totals, timestampByCatIdx, loading, error };
+  return { totals, timestampByCatIdx, loading, error, latestBatch, addPrayer };
 }

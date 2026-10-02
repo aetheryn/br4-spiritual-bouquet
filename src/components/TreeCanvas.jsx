@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { drawTree } from "../treeEngine";
 
 export default function TreeCanvas({ tree, designW, designH }) {
   const canvasRef = useRef(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -19,13 +19,7 @@ export default function TreeCanvas({ tree, designW, designH }) {
   return (
     <canvas
       ref={canvasRef}
-      style={{
-        width: "100%",
-        height: "100vh",
-        display: "block",
-        objectFit: "contain",
-        objectPosition: "center",
-      }}
+      style={{ width: "100%", height: "100%", display: "block" }}
     />
   );
 }

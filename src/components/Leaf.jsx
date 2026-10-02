@@ -64,6 +64,7 @@ export default function Leaf({
   shade,
   tooltipLabel,
   onHoverChange,
+  bloomDelay,
 }) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const rotDeg = (rot * 180) / Math.PI;
@@ -114,7 +115,16 @@ export default function Leaf({
         transform={`translate(${x} ${y}) rotate(${rotDeg}) scale(${scale})`}
         style={{ pointerEvents: "auto", cursor: "pointer" }}
       >
-        <LeafGlyph color={color} shade={shade} outlined={false} />
+        <g
+          className={bloomDelay === undefined ? undefined : "leaf-bloom"}
+          style={
+            bloomDelay === undefined
+              ? undefined
+              : { animationDelay: `${bloomDelay}ms` }
+          }
+        >
+          <LeafGlyph color={color} shade={shade} outlined={false} />
+        </g>
       </g>
       {tooltipOpen && tooltipLabel && (
         <FloatingPortal>

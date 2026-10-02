@@ -1,17 +1,41 @@
 import { useMemo, useState } from "react";
-import { mulberry32, generateTree, CATS } from "../treeEngine";
+import {
+  mulberry32,
+  generateTree,
+  CATS,
+  TREE_PHASES,
+  phaseIndexForTotal,
+} from "../treeEngine";
+import { useIsMobile } from "../hooks/useIsMobile";
 import TreeCanvas from "./TreeCanvas";
 import Leaf, { LeafGhost } from "./Leaf";
-import { usePrayerData } from "../hooks/usePrayerData";
 
 const DESIGN_W = 960;
-const DESIGN_H = 640;
+const DESKTOP_H = 640;
+const MOBILE_H = 862;
+const GROW_MS = 700; // must match .tree-grow's duration in index.css
+const BLOOM_STAGGER_MS = 70;
 
-export default function Tree() {
+export default function Tree({ totals, timestampByCatIdx, latestBatch }) {
+  const isMobile = useIsMobile();
+  const designH = isMobile ? MOBILE_H : DESKTOP_H;
+
+  const total = Object.values(totals).reduce((sum, n) => sum + n, 0);
+  const phaseIndex = phaseIndexForTotal(total);
+  const crossedPhase =
+    latestBatch !== null &&
+    phaseIndexForTotal(total - latestBatch.size) !== phaseIndex;
+
   const tree = useMemo(() => {
     const rng = mulberry32(20260903);
-    return generateTree(rng, DESIGN_W, DESIGN_H);
-  }, []);
+    return generateTree(
+      rng,
+      DESIGN_W,
+      designH,
+      TREE_PHASES[phaseIndex],
+      isMobile,
+    );
+  }, [phaseIndex, designH, isMobile]);
 
   const catById = useMemo(() => {
     const map = {};
@@ -21,16 +45,31 @@ export default function Tree() {
     return map;
   }, []);
 
-  const { timestampByCatIdx, loading } = usePrayerData();
-
-  const leafCatIdx = useMemo(() => {
+  const visibleLeaves = useMemo(() => {
     const counters = {};
-    return tree.leafSlots.map((leaf) => {
+    const visible = [];
+    tree.leafSlots.forEach((leaf, slotIndex) => {
       const idx = counters[leaf.catId] ?? 0;
       counters[leaf.catId] = idx + 1;
-      return idx;
+      if (idx < totals[leaf.catId]) {
+        visible.push({
+          leaf,
+          slotIndex,
+          timestamp: timestampByCatIdx[leaf.catId]?.[idx],
+        });
+      }
     });
-  }, [tree]);
+    visible.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    let order = 0;
+    visible.forEach((v) => {
+      if (latestBatch && v.timestamp === latestBatch.timestamp) {
+        v.bloomDelay = (crossedPhase ? GROW_MS : 0) + order * BLOOM_STAGGER_MS;
+        order += 1;
+      }
+    });
+    return visible;
+  }, [tree, totals, timestampByCatIdx, latestBatch, crossedPhase]);
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -44,22 +83,28 @@ export default function Tree() {
   const hoveredLeaf =
     hoveredIndex !== null ? tree.leafSlots[hoveredIndex] : null;
 
-  const formatTooltip = (leaf, idx) => {
-    const timestamp = timestampByCatIdx[leaf.catId]?.[idx];
+  const formatTooltip = (catId, timestamp) => {
     if (!timestamp) return null;
     const date = new Date(timestamp).toLocaleDateString(undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-    return `${catById[leaf.catId].singular} added to the tree on ${date}`;
+    return `${catById[catId].singular} added to the tree on ${date}`;
   };
 
   return (
-    <>
-      <TreeCanvas tree={tree} designW={DESIGN_W} designH={DESIGN_H} />
+    <div
+      key={phaseIndex}
+      className={crossedPhase ? "tree-frame tree-grow" : "tree-frame"}
+      style={{
+        aspectRatio: `${DESIGN_W} / ${designH}`,
+        width: `min(100%, calc(100vh * ${DESIGN_W / designH}))`,
+      }}
+    >
+      <TreeCanvas tree={tree} designW={DESIGN_W} designH={designH} />
       <svg
-        viewBox={`0 0 ${DESIGN_W} ${DESIGN_H}`}
+        viewBox={`0 0 ${DESIGN_W} ${designH}`}
         preserveAspectRatio="xMidYMid meet"
         style={{
           position: "absolute",
@@ -69,13 +114,16 @@ export default function Tree() {
           pointerEvents: "none",
         }}
       >
-        {tree.leafSlots.map((leaf, i) => (
+        {visibleLeaves.map(({ leaf, slotIndex, timestamp, bloomDelay }) => (
           <Leaf
-            key={i}
+            key={`${phaseIndex}-${slotIndex}`}
             {...leaf}
             color={catById[leaf.catId].color}
-            tooltipLabel={loading ? null : formatTooltip(leaf, leafCatIdx[i])}
-            onHoverChange={(isHovered) => handleHoverChange(i, isHovered)}
+            bloomDelay={bloomDelay}
+            tooltipLabel={formatTooltip(leaf.catId, timestamp)}
+            onHoverChange={(isHovered) =>
+              handleHoverChange(slotIndex, isHovered)
+            }
           />
         ))}
         {hoveredLeaf && (
@@ -90,6 +138,6 @@ export default function Tree() {
           />
         )}
       </svg>
-    </>
+    </div>
   );
 }

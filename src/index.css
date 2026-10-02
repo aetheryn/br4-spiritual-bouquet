@@ -69,3 +69,129 @@ button {
   z-index: 50;
   max-width: 220px;
 }
+
+.offer-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.offer-drawer {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 100;
+}
+
+.offer-drawer form {
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.offer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.offer-label {
+  flex: 1;
+  font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  color: var(--ink);
+}
+
+.offer-step {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+}
+
+.offer-count {
+  width: 48px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.offer-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.offer-error {
+  color: #b3261e;
+  font-size: 0.85rem;
+}
+
+.offer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.tree-frame {
+  position: relative;
+  margin: auto;
+  /* width: min(100%, 150vh);
+  aspect-ratio: 960 / 640; */
+}
+
+@keyframes tree-grow {
+  from {
+    transform: scale(0.5);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tree-grow {
+  transform-origin: 50% 98%;
+  animation: tree-grow 700ms cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+@keyframes leaf-bloom {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.leaf-bloom {
+  transform-origin: 0 0;
+  animation: leaf-bloom 950ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tree-grow,
+  .leaf-bloom {
+    animation: none;
+  }
+}

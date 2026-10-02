@@ -128,14 +128,66 @@ export function fillTaperedPath(ctx, pts, widths, color) {
 }
 
 // Full Bloom's own numbers, hardcoded — the phase system arrives in a later step.
-export function generateTree(rng, W, H) {
+
+export const TREE_PHASES = [
+  {
+    name: "Sapling",
+    maxTotal: 24,
+    treeScale: 0.22,
+    maxDepth: 2,
+    leafTarget: 30,
+    primaryN: () => 2,
+    leafScaleRange: [0.4, 0.6],
+  },
+  {
+    name: "Small Sprout",
+    maxTotal: 49,
+    treeScale: 0.33,
+    maxDepth: 2,
+    leafTarget: 60,
+    primaryN: () => 3,
+    leafScaleRange: [0.5, 0.7],
+  },
+  {
+    name: "Young Tree",
+    maxTotal: 99,
+    treeScale: 0.45,
+    maxDepth: 3,
+    leafTarget: 120,
+    primaryN: (rng) => 3 + Math.floor(rng() * 2),
+  },
+  {
+    name: "Mature Tree",
+    maxTotal: 199,
+    treeScale: 0.56,
+    maxDepth: 3,
+    leafTarget: 240,
+    primaryN: (rng) => 4 + Math.floor(rng() * 2),
+  },
+  {
+    name: "Full Bloom",
+    maxTotal: Infinity,
+    treeScale: 0.645,
+    maxDepth: 4,
+    leafTarget: 560,
+    primaryN: (rng) => 5 + Math.floor(rng() * 2),
+  },
+];
+
+export const phaseIndexForTotal = (total) =>
+  TREE_PHASES.findIndex((p) => total <= p.maxTotal);
+
+export function generateTree(rng, W, H, phase, isMobile) {
   const branches = [],
     buds = [],
     lobes = [],
     leafBranches = [];
   const baseX = W * 0.5,
     baseY = H * 0.98;
-  const treeScale = 0.645;
+  const { leafScaleRange } = phase;
+  const treeScale = Math.min(phase.treeScale * (isMobile ? 1.2 : 1), 0.66);
+  const leafScaleFactor = treeScale / 0.645;
+  const sizeRatio = H / 640;
   const crotchY = baseY - (baseY - H * 0.78) * treeScale;
   const canopyCenterY = baseY - (baseY - H * 0.2) * treeScale;
 
@@ -169,7 +221,7 @@ export function generateTree(rng, W, H) {
   const fork = trunkPts[trunkPts.length - 1];
   const forkW = trunkWidths[trunkWidths.length - 1];
 
-  const maxDepth = 4;
+  const { maxDepth } = phase;
   function grow(x, y, angle, len, width, depth) {
     const curveFactor = depth === 0 ? 0.05 : 0.22;
     const midAngle = angle + (rng() - 0.5) * curveFactor;
@@ -219,7 +271,7 @@ export function generateTree(rng, W, H) {
   }
 
   const primaryBase = (crotchY - canopyCenterY) * 0.46;
-  const primaryN = 5 + Math.floor(rng() * 2);
+  const primaryN = phase.primaryN(rng);
   for (let pc = 0; pc < primaryN; pc++) {
     const pSpread =
       (pc - (primaryN - 1) / 2) * (2.3 / (primaryN - 1)) + (rng() - 0.5) * 0.1;
@@ -249,13 +301,16 @@ export function generateTree(rng, W, H) {
     lobes.push({ x: cxp, y: cyp, r: Math.max(13 * treeScale, b.len * 0.6) });
   });
 
-  const sampler = makeSampler(8 * treeScale, 8.2 * treeScale);
+  const sampler = makeSampler(
+    8 * treeScale * sizeRatio,
+    8.2 * treeScale * sizeRatio,
+  );
   let totalLen = 0;
   leafBranches.forEach((b) => {
     totalLen += b.len;
   });
 
-  const target = 560; // Full Bloom's leafTarget — phase system comes later
+  const target = phase.leafTarget;
   const out = [];
   let attempts = 0;
   const maxAttempts = target * 90;
@@ -274,7 +329,7 @@ export function generateTree(rng, W, H) {
     const tt = 0.6 + rng() * 0.4;
     const bx = b.x1 + (b.x2 - b.x1) * tt;
     const by = b.y1 + (b.y2 - b.y1) * tt;
-    const clusterR = (9 + tt * 18) * treeScale;
+    const clusterR = (9 + tt * 18) * treeScale * sizeRatio;
     const ang2 = rng() * Math.PI * 2;
     const rr = clusterR * Math.sqrt(rng());
     const px2 = bx + Math.cos(ang2) * rr;
@@ -283,12 +338,17 @@ export function generateTree(rng, W, H) {
       continue;
     if (sampler.tooClose(px2, py2)) continue;
     sampler.place(px2, py2);
+
+    const thisLeafFactor = leafScaleRange
+      ? leafScaleRange[0] + rng() * (leafScaleRange[1] - leafScaleRange[0])
+      : leafScaleFactor;
     const outwardAngle = Math.atan2(px2 - bx, -(py2 - by));
     out.push({
       x: px2,
       y: py2,
       rot: outwardAngle + (rng() - 0.5) * 0.6,
-      scale: (1.25 + tt * 0.45 + rng() * 0.3) * 1.15,
+      scale:
+        (1.25 + tt * 0.45 + rng() * 0.3) * 1.15 * thisLeafFactor * sizeRatio,
       shade: 0.58 + tt * 0.4 + rng() * 0.06,
     });
   }
@@ -323,7 +383,7 @@ export function drawTree(ctx, tree, H) {
       lb.y,
       lb.r,
     );
-    g.addColorStop(0, "rgba(74,60,20,0.4)");
+    g.addColorStop(0, "rgba(74,60,20,0.05)");
     g.addColorStop(1, "rgba(74,60,20,0)");
     ctx.fillStyle = g;
     ctx.beginPath();

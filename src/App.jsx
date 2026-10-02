@@ -1,11 +1,12 @@
-import Tree from "./components/Tree";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Bouquet from "./pages/Bouquet";
 
-function App() {
+export default function App() {
   return (
-    <div id="stage">
-      <Tree />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Bouquet />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
