@@ -73,7 +73,7 @@ export default function Leaf({
     open: tooltipOpen,
     onOpenChange: setTooltipOpen,
     placement: "top",
-    middleware: [offset(20), flip(), shift({ padding: 200 })],
+    middleware: [offset(20), flip(), shift({ padding: 12 })],
   });
 
   const hover = useHover(context, { delay: { open: 200, close: 0 } });
