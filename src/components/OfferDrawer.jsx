@@ -129,10 +129,10 @@ export default function OfferDrawer({ onSubmitted }) {
   };
 
   const submitLabel = submitting
-    ? "Adding…"
+    ? "Offering…"
     : total === 0
-      ? "Choose what to offer"
-      : `Add ${total} ${total === 1 ? "prayer" : "prayers"} to the bouquet`;
+      ? "Offer"
+      : `Offer ${total} ${total === 1 ? "prayer" : "prayers"}`;
 
   return (
     <>
@@ -141,7 +141,7 @@ export default function OfferDrawer({ onSubmitted }) {
         className="offer-toggle"
         onClick={() => setOpen(true)}
       >
-        Offer a Prayer
+        Offer a prayer
       </button>
 
       <div
@@ -171,15 +171,9 @@ export default function OfferDrawer({ onSubmitted }) {
             </div>
 
             <div className="offer-head">
-              <div>
-                <span className="offer-eyebrow">Offer a prayer</span>
-                <h2 className="offer-title" id="offer-title">
-                  Add to the bouquet
-                </h2>
-                <p className="offer-lede">
-                  Set how many of each you're offering, then send them up.
-                </p>
-              </div>
+              <h2 className="offer-title" id="offer-title">
+                Offer a prayer
+              </h2>
               <button
                 type="button"
                 className="offer-close"

@@ -1,18 +1,16 @@
-const RETREAT_NAME = "Breathe Retreat #4";
+const RETREAT_NAME = "Breathe #4";
 
 export default function Header({ total }) {
   return (
-    <div className="stage-header">
+    <header className="stage-header">
       <div className="stage-title-block">
-        <span className="stage-eyebrow">Spiritual bouquet</span>
-        <h1 className="stage-title">
-          Prayer Bouquet <em>— {RETREAT_NAME}</em>
-        </h1>
+        <h1 className="stage-title">Spiritual Bouquet</h1>
+        <span className="stage-retreat">{RETREAT_NAME}</span>
       </div>
       <div className="stage-total">
-        <span className="label">Prayers offered</span>
         <span className="value">{total.toLocaleString()}</span>
+        <span className="label">prayers</span>
       </div>
-    </div>
+    </header>
   );
 }

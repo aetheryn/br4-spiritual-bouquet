@@ -99,7 +99,7 @@ export default function Tree({ totals, timestampByCatIdx, latestBatch }) {
       className={crossedPhase ? "tree-frame tree-grow" : "tree-frame"}
       style={{
         aspectRatio: `${DESIGN_W} / ${designH}`,
-        width: `min(100%, calc(100vh * ${DESIGN_W / designH}))`,
+        width: `min(100cqw, calc(100cqh * ${DESIGN_W / designH}))`,
       }}
     >
       <TreeCanvas tree={tree} designW={DESIGN_W} designH={designH} />

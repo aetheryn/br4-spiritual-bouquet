@@ -177,6 +177,22 @@ export const TREE_PHASES = [
 export const phaseIndexForTotal = (total) =>
   TREE_PHASES.findIndex((p) => total <= p.maxTotal);
 
+export function phaseProgress(total) {
+  const index = phaseIndexForTotal(total);
+  const phase = TREE_PHASES[index];
+  const next = TREE_PHASES[index + 1];
+  if (!next) return { phase, next: null, remaining: 0, fraction: 1 };
+
+  const start = index === 0 ? 0 : TREE_PHASES[index - 1].maxTotal + 1;
+  const end = phase.maxTotal + 1;
+  return {
+    phase,
+    next,
+    remaining: end - total,
+    fraction: (total - start) / (end - start),
+  };
+}
+
 export function generateTree(rng, W, H, phase, isMobile) {
   const branches = [],
     buds = [],
