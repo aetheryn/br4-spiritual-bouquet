@@ -1,7 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="112" fill="#fff8e5"/>
+  <style>
+    .bg { fill: #fff8e5; }
+    .stem { fill: #5c380f; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #5c380f; }
+      .stem { fill: #e6cd98; }
+    }
+  </style>
+  <rect class="bg" width="512" height="512" rx="112"/>
   <g transform="translate(73.96 -4.48) scale(2.9600)">
-  <path d="M55 152 C57 126 59 100 60 70 L64 70 C65 100 67 126 70 152 Z" fill="#5c380f"/>
+  <path class="stem" d="M55 152 C57 126 59 100 60 70 L64 70 C65 100 67 126 70 152 Z"/>
   <path d="M60 118 C46 120 26 112 16 96 C34 90 54 98 60 118 Z" fill="#d7a05f"/>
   <path d="M63 100 C77 100 97 92 107 76 C89 70 69 80 63 100 Z" fill="#b8b05d"/>
   <path d="M62 76 C51 62 51 42 62 24 C73 42 73 62 62 76 Z" fill="#7f933a"/>

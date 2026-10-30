@@ -9,6 +9,10 @@ const RATE_LIMIT_WINDOW_SECONDS = 600; // 10 minutes
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const MAX_PRAYERS_PER_SUBMISSION = 20;
 const MAX_NAME_LENGTH = 60;
+// Browsers never reuse the list (max-age=0), but Vercel's CDN may serve one
+// copy to everyone for a few seconds, so a crowd opening the app together
+// costs Airtable one read instead of one per person (its limit is 5 req/s).
+const PRAYERS_CACHE_CONTROL = "public, max-age=0, s-maxage=5";
 const CATEGORY_FIELDS = ["mass", "adoration", "rosary", "fasting"];
 
 async function checkRateLimit(ip) {
@@ -91,9 +95,11 @@ async function handleGet(req, res) {
       name: record.fields.name ?? "",
     }));
 
+    res.setHeader("Cache-Control", PRAYERS_CACHE_CONTROL);
     return res.status(200).json({ prayers });
   } catch (err) {
     console.error("Failed to fetch prayers:", err);
+    res.setHeader("Cache-Control", "no-store");
     return res.status(500).json({ error: "Failed to fetch prayers" });
   }
 }
