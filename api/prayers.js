@@ -8,6 +8,7 @@ const kv = new Redis({
 const RATE_LIMIT_WINDOW_SECONDS = 600; // 10 minutes
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const MAX_PRAYERS_PER_SUBMISSION = 20;
+const MAX_NAME_LENGTH = 60;
 const CATEGORY_FIELDS = ["mass", "adoration", "rosary", "fasting"];
 
 async function checkRateLimit(ip) {
@@ -18,7 +19,15 @@ async function checkRateLimit(ip) {
 }
 
 function validatePayload(body) {
-  const fields = {};
+  const name = typeof body.name === "string" ? body.name.trim() : "";
+  if (!name) {
+    return { error: "Please enter your name" };
+  }
+  if (name.length > MAX_NAME_LENGTH) {
+    return { error: `Name must be ${MAX_NAME_LENGTH} characters or fewer` };
+  }
+
+  const fields = { name };
   let total = 0;
 
   for (const field of CATEGORY_FIELDS) {
@@ -79,6 +88,7 @@ async function handleGet(req, res) {
       adoration: record.fields.adoration ?? 0,
       rosary: record.fields.rosary ?? 0,
       fasting: record.fields.fasting ?? 0,
+      name: record.fields.name ?? "",
     }));
 
     return res.status(200).json({ prayers });

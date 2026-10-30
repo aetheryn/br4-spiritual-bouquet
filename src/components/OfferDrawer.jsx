@@ -10,6 +10,7 @@ const CATEGORIES = [
 
 const EMPTY_DRAFT = { mass: 0, rosary: 0, adoration: 0, fasting: 0 };
 const MAX_PER_OFFERING = 20; // mirrors MAX_PRAYERS_PER_SUBMISSION in api/prayers.js
+const MAX_NAME_LENGTH = 60; // mirrors MAX_NAME_LENGTH in api/prayers.js
 const DISMISS_DRAG_PX = 100;
 const FLICK_VELOCITY = 0.6; // px per ms
 const FLICK_MIN_PX = 40;
@@ -17,6 +18,7 @@ const FLICK_MIN_PX = 40;
 export default function OfferDrawer({ onSubmitted }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
+  const [name, setName] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -24,6 +26,7 @@ export default function OfferDrawer({ onSubmitted }) {
   const sheetRef = useRef(null);
 
   const total = CATEGORIES.reduce((sum, { field }) => sum + draft[field], 0);
+  const canSubmit = total > 0 && name.trim() !== "";
 
   const close = () => {
     setOpen(false);
@@ -101,14 +104,18 @@ export default function OfferDrawer({ onSubmitted }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
-    if (total === 0) return;
+    if (!canSubmit) return;
 
     setSubmitting(true);
     try {
       const response = await fetch("/api/prayers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...draft, website: honeypot }),
+        body: JSON.stringify({
+          ...draft,
+          name: name.trim(),
+          website: honeypot,
+        }),
       });
       const data = await response.json();
 
@@ -199,6 +206,21 @@ export default function OfferDrawer({ onSubmitted }) {
           </div>
 
           <form onSubmit={handleSubmit}>
+            <label className="offer-name-field">
+              <span className="cat-name">Your name</span>
+              <input
+                type="text"
+                className="offer-name-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="First name is fine"
+                maxLength={MAX_NAME_LENGTH}
+                autoComplete="name"
+                autoCapitalize="words"
+                enterKeyHint="done"
+              />
+            </label>
+
             <div className="offer-list">
               {CATEGORIES.map(({ field, catId }) => {
                 const cat = CATS.find((c) => c.id === catId);
@@ -271,7 +293,7 @@ export default function OfferDrawer({ onSubmitted }) {
             <button
               type="submit"
               className="offer-submit"
-              disabled={submitting || total === 0}
+              disabled={submitting || !canSubmit}
             >
               {submitLabel}
             </button>

@@ -11,7 +11,7 @@ import Toast from "../components/Toast";
 export default function Bouquet() {
   const {
     totals,
-    timestampByCatIdx,
+    offeringByCatIdx,
     loading,
     error,
     latestBatch,
@@ -51,7 +51,7 @@ export default function Bouquet() {
       <div className="stage-tree">
         <Tree
           totals={totals}
-          timestampByCatIdx={timestampByCatIdx}
+          offeringByCatIdx={offeringByCatIdx}
           latestBatch={latestBatch}
         />
       </div>

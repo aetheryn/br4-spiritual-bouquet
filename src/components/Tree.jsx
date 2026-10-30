@@ -16,7 +16,7 @@ const MOBILE_H = 862;
 const GROW_MS = 700; // must match .tree-grow's duration in index.css
 const BLOOM_STAGGER_MS = 70;
 
-export default function Tree({ totals, timestampByCatIdx, latestBatch }) {
+export default function Tree({ totals, offeringByCatIdx, latestBatch }) {
   const isMobile = useIsMobile();
   const designH = isMobile ? MOBILE_H : DESKTOP_H;
 
@@ -55,7 +55,8 @@ export default function Tree({ totals, timestampByCatIdx, latestBatch }) {
         visible.push({
           leaf,
           slotIndex,
-          timestamp: timestampByCatIdx[leaf.catId]?.[idx],
+          timestamp: offeringByCatIdx[leaf.catId]?.[idx]?.timestamp,
+          name: offeringByCatIdx[leaf.catId]?.[idx]?.name,
         });
       }
     });
@@ -69,7 +70,7 @@ export default function Tree({ totals, timestampByCatIdx, latestBatch }) {
       }
     });
     return visible;
-  }, [tree, totals, timestampByCatIdx, latestBatch, crossedPhase]);
+  }, [tree, totals, offeringByCatIdx, latestBatch, crossedPhase]);
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -83,14 +84,15 @@ export default function Tree({ totals, timestampByCatIdx, latestBatch }) {
   const hoveredLeaf =
     hoveredIndex !== null ? tree.leafSlots[hoveredIndex] : null;
 
-  const formatTooltip = (catId, timestamp) => {
+  const formatTooltip = (catId, timestamp, name) => {
     if (!timestamp) return null;
     const date = new Date(timestamp).toLocaleDateString(undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-    return `${catById[catId].singular} added to the tree on ${date}`;
+    const by = name ? ` by ${name}` : "";
+    return `${catById[catId].singular} offered${by} on ${date}`;
   };
 
   return (
@@ -114,18 +116,20 @@ export default function Tree({ totals, timestampByCatIdx, latestBatch }) {
           pointerEvents: "none",
         }}
       >
-        {visibleLeaves.map(({ leaf, slotIndex, timestamp, bloomDelay }) => (
-          <Leaf
-            key={`${phaseIndex}-${slotIndex}`}
-            {...leaf}
-            color={catById[leaf.catId].color}
-            bloomDelay={bloomDelay}
-            tooltipLabel={formatTooltip(leaf.catId, timestamp)}
-            onHoverChange={(isHovered) =>
-              handleHoverChange(slotIndex, isHovered)
-            }
-          />
-        ))}
+        {visibleLeaves.map(
+          ({ leaf, slotIndex, timestamp, name, bloomDelay }) => (
+            <Leaf
+              key={`${phaseIndex}-${slotIndex}`}
+              {...leaf}
+              color={catById[leaf.catId].color}
+              bloomDelay={bloomDelay}
+              tooltipLabel={formatTooltip(leaf.catId, timestamp, name)}
+              onHoverChange={(isHovered) =>
+                handleHoverChange(slotIndex, isHovered)
+              }
+            />
+          ),
+        )}
         {hoveredLeaf && (
           <LeafGhost
             x={hoveredLeaf.x}

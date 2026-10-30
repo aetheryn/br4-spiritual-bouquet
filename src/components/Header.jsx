@@ -14,7 +14,7 @@ export default function Header({ total }) {
       </div>
       <div className="stage-total">
         <span className="value">{total.toLocaleString()}</span>
-        <span className="label">prayers</span>
+        <span className="label">offered</span>
       </div>
     </header>
   );

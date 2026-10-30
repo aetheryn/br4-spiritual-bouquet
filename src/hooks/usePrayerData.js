@@ -56,17 +56,20 @@ export function usePrayerData() {
   );
 
   const totals = {};
-  const timestampByCatIdx = {};
+  const offeringByCatIdx = {};
   for (const catId of Object.values(CATEGORY_MAP)) {
     totals[catId] = 0;
-    timestampByCatIdx[catId] = {};
+    offeringByCatIdx[catId] = {};
   }
 
   for (const row of sorted) {
     for (const [airtableField, catId] of Object.entries(CATEGORY_MAP)) {
       const count = row[airtableField] ?? 0;
       for (let i = 0; i < count; i++) {
-        timestampByCatIdx[catId][totals[catId]] = row.timestamp;
+        offeringByCatIdx[catId][totals[catId]] = {
+          timestamp: row.timestamp,
+          name: row.name ?? "",
+        };
         totals[catId] += 1;
       }
     }
@@ -74,7 +77,7 @@ export function usePrayerData() {
 
   return {
     totals,
-    timestampByCatIdx,
+    offeringByCatIdx,
     loading,
     error,
     latestBatch,
