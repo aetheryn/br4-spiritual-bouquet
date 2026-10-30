@@ -12,6 +12,7 @@ export function usePrayerData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [latestBatch, setLatestBatch] = useState(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +35,13 @@ export function usePrayerData() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [attempt]);
+
+  const retry = () => {
+    setError(null);
+    setLoading(true);
+    setAttempt((n) => n + 1);
+  };
 
   const addPrayer = (record) => {
     setPrayers((prev) => [...prev, record]);
@@ -65,5 +72,13 @@ export function usePrayerData() {
     }
   }
 
-  return { totals, timestampByCatIdx, loading, error, latestBatch, addPrayer };
+  return {
+    totals,
+    timestampByCatIdx,
+    loading,
+    error,
+    latestBatch,
+    addPrayer,
+    retry,
+  };
 }
