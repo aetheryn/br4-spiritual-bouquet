@@ -430,7 +430,6 @@ html.scroll-locked {
   align-items: center;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid var(--hairline);
 }
 
 .legend-item .name {
@@ -1043,7 +1042,6 @@ html.scroll-locked {
 .offer-name-field {
   display: block;
   padding: 6px 0 8px;
-  border-bottom: 1px solid var(--hairline);
 }
 
 .offer-name-input {

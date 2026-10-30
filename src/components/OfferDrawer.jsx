@@ -248,7 +248,7 @@ export default function OfferDrawer({ onSubmitted }) {
                 className="offer-name-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="First name is fine"
+                placeholder="Your first name or nickname please :)"
                 maxLength={MAX_NAME_LENGTH}
                 autoComplete="name"
                 autoCapitalize="words"

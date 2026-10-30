@@ -6,9 +6,9 @@ export default function Header({ total }) {
   return (
     <header className="stage-header">
       <div className="stage-title-block">
-        <h1 className="stage-title">Spiritual Bouquet</h1>
+        <h1 className="stage-title">{RETREAT_NAME}</h1>
         <div className="stage-retreat-row">
-          <span className="stage-retreat">{RETREAT_NAME}</span>
+          <span className="stage-retreat">Spiritual Bouquet</span>
           <HelpButton />
         </div>
       </div>
