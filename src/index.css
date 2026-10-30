@@ -270,6 +270,15 @@ html.drawer-open {
   color: var(--ink);
 }
 
+.help-button:focus-visible {
+  outline: none;
+}
+
+.help-button:focus-visible .help-mark {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 .stage-total {
   flex: none;
   text-align: right;
