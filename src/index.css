@@ -117,7 +117,8 @@ html.drawer-open {
 @media (prefers-reduced-motion: reduce) {
   .tree-grow,
   .leaf-bloom,
-  .status {
+  .status,
+  .toast {
     animation: none;
   }
 }
@@ -220,14 +221,53 @@ html.drawer-open {
   margin: 0;
 }
 
-.stage-retreat {
-  display: block;
+.stage-retreat-row {
+  display: flex;
+  align-items: center;
   margin-top: 4px;
+}
+
+.stage-retreat {
   font-family: "Fraunces", Georgia, serif;
   font-style: italic;
   font-weight: 400;
   font-size: 1.15rem;
   color: var(--ink-muted);
+}
+
+.help-button {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  margin: -11px 0 -11px -6px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.help-mark {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink-faint);
+  border-radius: 50%;
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--ink-muted);
+}
+
+.help-button:hover .help-mark {
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .stage-total {
@@ -328,6 +368,143 @@ html.drawer-open {
   .stage-tree {
     padding-bottom: calc(76px + env(safe-area-inset-bottom));
   }
+}
+
+/* ---------- toast ---------- */
+
+.toast-region {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(max(20px, env(safe-area-inset-bottom)) + 64px);
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+  pointer-events: none;
+}
+
+.toast {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  text-align: center;
+  color: var(--ink);
+  animation: toast ease both;
+}
+
+@keyframes toast {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8%,
+  88% {
+    opacity: 1;
+  }
+}
+
+/* ---------- help page ---------- */
+
+.help-page {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--bg);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 180ms ease,
+    visibility 0s linear 180ms;
+}
+
+.help-page.open {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 180ms ease,
+    visibility 0s;
+}
+
+.help-page:focus {
+  outline: none;
+}
+
+.help-inner {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: clamp(18px, 4vw, 36px) 20px calc(40px + env(safe-area-inset-bottom));
+}
+
+.help-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.help-title {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-size: clamp(1.9rem, 6.5vw, 2.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.help-close {
+  flex: none;
+  height: 44px;
+  margin-right: -8px;
+  padding: 0 8px;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.help-close:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.help-text {
+  margin: 20px 0 0;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.help-text strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.help-cats {
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+
+.help-cats li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.help-cats .swatch {
+  margin-top: 6px;
 }
 
 /* ---------- offer button + drawer ---------- */
@@ -479,13 +656,30 @@ html.drawer-open {
   border-bottom: 1px solid var(--hairline);
 }
 
+.offer-row .swatch {
+  align-self: flex-start;
+  margin-top: 15px;
+}
+
 .offer-label {
   flex: 1;
   min-width: 0;
+}
+
+.cat-name {
+  display: block;
   font-weight: 600;
   font-size: 1.05rem;
   line-height: 1.25;
   color: var(--ink);
+}
+
+.cat-desc {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--ink-muted);
 }
 
 .offer-controls {

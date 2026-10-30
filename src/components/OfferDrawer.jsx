@@ -211,7 +211,10 @@ export default function OfferDrawer({ onSubmitted }) {
                     key={field}
                   >
                     <span className="swatch" />
-                    <span className="offer-label">{cat.label}</span>
+                    <span className="offer-label">
+                      <span className="cat-name">{cat.label}</span>
+                      <span className="cat-desc">{cat.description}</span>
+                    </span>
                     <div className="offer-controls">
                       <button
                         type="button"
