@@ -65,23 +65,27 @@ export function GrowingTreeArt({ running }) {
   );
 }
 
+// One big leaf per kind of prayer, laid out like a page from a field guide.
 export function CategoriesArt() {
   return (
-    <ul className="help-cats">
-      {CATS.map((cat) => (
-        <li key={cat.id} style={{ "--swatch": cat.color }}>
-          <span className="swatch" />
-          <span>
-            <span className="cat-name">{cat.label}</span>
-            <span className="cat-desc">{cat.description}</span>
-          </span>
+    <ul className="help-specimens">
+      {CATS.map((cat, i) => (
+        <li key={cat.id}>
+          <svg className="help-specimen-leaf" viewBox="-12 -12 24 24">
+            <g transform={`rotate(${i % 2 === 0 ? -28 : 28})`}>
+              <LeafGlyph color={cat.color} shade={1} />
+            </g>
+          </svg>
+          <span className="cat-name">{cat.label}</span>
+          <span className="cat-desc">{cat.description}</span>
         </li>
       ))}
     </ul>
   );
 }
 
-// A static picture of the drawer, built from the same classes as the real one.
+// A static picture of the drawer, drawn small inside a phone-like frame so it
+// reads as a screenshot and not as part of the instructions.
 export function OfferArt() {
   const rows = [
     { cat: CATS[0], count: 2 },
@@ -90,7 +94,8 @@ export function OfferArt() {
   const total = rows.reduce((sum, row) => sum + row.count, 0);
 
   return (
-    <div className="help-mock" aria-hidden="true">
+    <div className="help-screen" aria-hidden="true">
+      <span className="help-screen-handle" />
       <div className="help-mock-name">
         <span className="cat-name">Your name</span>
         <span className="help-mock-field">Maria</span>
@@ -126,20 +131,20 @@ export function OfferArt() {
 }
 
 const MOCK_LEAVES = [
-  { x: 52, y: 150, rot: -0.6, cat: 0 },
-  { x: 96, y: 182, rot: 0.4, cat: 3 },
-  { x: 206, y: 164, rot: 2.4, cat: 1 },
-  { x: 238, y: 122, rot: 0.9, cat: 2 },
-  { x: 38, y: 104, rot: 1.1, cat: 3 },
-  { x: 232, y: 190, rot: -0.3, cat: 0 },
+  { x: 52, y: 122, rot: -0.6, cat: 0 },
+  { x: 96, y: 150, rot: 0.4, cat: 3 },
+  { x: 206, y: 136, rot: 2.4, cat: 1 },
+  { x: 238, y: 100, rot: 0.9, cat: 2 },
+  { x: 38, y: 86, rot: 1.1, cat: 3 },
+  { x: 232, y: 160, rot: -0.3, cat: 0 },
 ];
 
-// A leaf with the tooltip you get by hovering it.
+// A leaf with the tooltip you get by hovering it, inside the same frame.
 export function TooltipArt() {
   const active = CATS[0];
   return (
-    <div className="help-mock-tip" aria-hidden="true">
-      <svg viewBox="0 0 280 220">
+    <div className="help-screen help-screen-tip" aria-hidden="true">
+      <svg viewBox="0 0 280 180">
         {MOCK_LEAVES.map((leaf, i) => (
           <g
             key={i}
@@ -149,7 +154,7 @@ export function TooltipArt() {
           </g>
         ))}
         <g
-          transform="translate(140 150) rotate(29) scale(3.4)"
+          transform="translate(140 126) rotate(29) scale(3)"
           style={{
             filter: "drop-shadow(2px 3px 2.5px rgba(59, 36, 16, 0.45))",
           }}

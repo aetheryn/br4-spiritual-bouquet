@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CATS } from "../treeEngine";
+import { lockScroll } from "../scrollLock";
+import SubmitOverlay from "./SubmitOverlay";
 
 const CATEGORIES = [
   { field: "mass", catId: "masses" },
@@ -14,6 +16,7 @@ const MAX_NAME_LENGTH = 60; // mirrors MAX_NAME_LENGTH in api/prayers.js
 const DISMISS_DRAG_PX = 100;
 const FLICK_VELOCITY = 0.6; // px per ms
 const FLICK_MIN_PX = 40;
+const MIN_LOADING_MS = 1200; // keep the loading state from flashing past
 
 export default function OfferDrawer({ onSubmitted }) {
   const [open, setOpen] = useState(false);
@@ -22,6 +25,14 @@ export default function OfferDrawer({ onSubmitted }) {
   const [honeypot, setHoneypot] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [overlay, setOverlay] = useState({
+    visible: false,
+    phase: "submitting",
+    name: "",
+    count: 0,
+  });
+  const busyRef = useRef(false);
+  const pendingRef = useRef(null);
   const dragRef = useRef(null);
   const sheetRef = useRef(null);
 
@@ -36,13 +47,13 @@ export default function OfferDrawer({ onSubmitted }) {
   useEffect(() => {
     if (!open) return;
     sheetRef.current?.focus();
-    document.documentElement.classList.add("drawer-open");
+    const unlockScroll = lockScroll();
     const onKeyDown = (event) => {
-      if (event.key === "Escape") close();
+      if (event.key === "Escape" && !busyRef.current) close();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {
-      document.documentElement.classList.remove("drawer-open");
+      unlockScroll();
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
@@ -106,18 +117,30 @@ export default function OfferDrawer({ onSubmitted }) {
     setError(null);
     if (!canSubmit) return;
 
+    const cleanName = name.trim();
+    busyRef.current = true;
     setSubmitting(true);
+    setOverlay({
+      visible: true,
+      phase: "submitting",
+      name: cleanName,
+      count: total,
+    });
+
     try {
-      const response = await fetch("/api/prayers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...draft,
-          name: name.trim(),
-          website: honeypot,
+      const [response] = await Promise.all([
+        fetch("/api/prayers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...draft,
+            name: cleanName,
+            website: honeypot,
+          }),
         }),
-      });
-      const data = await response.json();
+        new Promise((resolve) => setTimeout(resolve, MIN_LOADING_MS)),
+      ]);
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(
@@ -125,19 +148,31 @@ export default function OfferDrawer({ onSubmitted }) {
         );
       }
 
-      onSubmitted?.(data);
+      // The tree is updated once the thank-you closes, so the new leaves
+      // bloom on screen instead of behind the overlay.
+      pendingRef.current = data;
+      setOverlay((prev) => ({ ...prev, phase: "success" }));
       setDraft(EMPTY_DRAFT);
       close();
     } catch (err) {
+      busyRef.current = false;
+      setOverlay((prev) => ({ ...prev, visible: false }));
       setError(err.message);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const submitLabel = submitting
-    ? "Offering…"
-    : total === 0
+  const finishSubmit = () => {
+    busyRef.current = false;
+    setOverlay((prev) => ({ ...prev, visible: false }));
+    const record = pendingRef.current;
+    pendingRef.current = null;
+    if (record) onSubmitted?.(record);
+  };
+
+  const submitLabel =
+    total === 0
       ? "Offer"
       : `Offer ${total} ${total === 1 ? "prayer" : "prayers"}`;
 
@@ -300,6 +335,14 @@ export default function OfferDrawer({ onSubmitted }) {
           </form>
         </div>
       </div>
+
+      <SubmitOverlay
+        visible={overlay.visible}
+        phase={overlay.phase}
+        name={overlay.name}
+        count={overlay.count}
+        onDone={finishSubmit}
+      />
     </>
   );
 }

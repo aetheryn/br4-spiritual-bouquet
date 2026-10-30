@@ -8,26 +8,45 @@ const LEAVES = [
   { d: "M61 76 C50 62 50 42 61 24 C72 42 72 62 61 76 Z", color: "fasting" },
 ];
 
-function SproutShape({ filled }) {
+function SproutShape({ filled, grow }) {
   return (
     <svg viewBox="0 0 120 160">
-      <path d={STEM} style={{ fill: filled ? "var(--bark)" : "var(--line)" }} />
-      {LEAVES.map((leaf) => (
+      <path
+        d={STEM}
+        className={grow ? "sprout-stem" : undefined}
+        style={{ fill: filled ? "var(--bark)" : "var(--line)" }}
+      />
+      {LEAVES.map((leaf, i) => (
         <path
           key={leaf.color}
           d={leaf.d}
-          style={{ fill: filled ? `var(--cat-${leaf.color})` : "var(--line)" }}
+          className={grow ? `sprout-leaf sprout-leaf-${i}` : undefined}
+          style={{
+            fill: filled ? `var(--cat-${leaf.color})` : "var(--line)",
+            "--i": i,
+          }}
         />
       ))}
     </svg>
   );
 }
 
-// A pale silhouette with the same sprout in full color on top, revealed from
-// the bottom up by an animated clip-path (see .sprout-fill in index.css).
-export default function Sprout() {
+// "fill": a pale silhouette with the same sprout in full color on top,
+// revealed from the bottom up (loading). "bloom": the colored sprout growing
+// out of the ground, stem first and then each leaf (success).
+export default function Sprout({ variant = "fill", large = false }) {
+  const size = large ? " sprout-lg" : "";
+
+  if (variant === "bloom") {
+    return (
+      <div className={`sprout sprout-bloom${size}`} aria-hidden="true">
+        <SproutShape filled grow />
+      </div>
+    );
+  }
+
   return (
-    <div className="sprout" aria-hidden="true">
+    <div className={`sprout${size}`} aria-hidden="true">
       <SproutShape />
       <div className="sprout-fill">
         <SproutShape filled />

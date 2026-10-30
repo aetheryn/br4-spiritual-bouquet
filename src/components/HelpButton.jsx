@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { lockScroll } from "../scrollLock";
 import { GrowingTreeArt, CategoriesArt, OfferArt, TooltipArt } from "./HelpArt";
 
 const STEPS = [
@@ -10,7 +11,7 @@ const STEPS = [
   },
   {
     title: "Four kinds of prayer",
-    body: "Each leaf takes the color of the prayer it stands for.",
+    body: "Every leaf takes the color of the prayer it stands for.",
     art: () => <CategoriesArt />,
   },
   {
@@ -49,7 +50,7 @@ export default function HelpButton() {
   const [step, setStep] = useState(0);
   const [hasOpened, setHasOpened] = useState(false);
   const buttonRef = useRef(null);
-  const pageRef = useRef(null);
+  const panelRef = useRef(null);
   const touchRef = useRef(null);
 
   const isFirst = step === 0;
@@ -71,8 +72,8 @@ export default function HelpButton() {
 
   useEffect(() => {
     if (!open) return;
-    pageRef.current?.focus();
-    document.documentElement.classList.add("drawer-open");
+    panelRef.current?.focus();
+    const unlockScroll = lockScroll();
     const onKeyDown = (event) => {
       if (event.key === "Escape") close();
       if (event.key === "ArrowLeft") go(-1);
@@ -80,7 +81,7 @@ export default function HelpButton() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => {
-      document.documentElement.classList.remove("drawer-open");
+      unlockScroll();
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
@@ -119,15 +120,20 @@ export default function HelpButton() {
       </button>
 
       <div
-        ref={pageRef}
-        className={open ? "help-page open" : "help-page"}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="help-title"
+        className={open ? "help-scrim open" : "help-scrim"}
         aria-hidden={!open}
-        tabIndex={-1}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) close();
+        }}
       >
-        <div className="help-inner">
+        <div
+          ref={panelRef}
+          className="help-panel"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="help-title"
+          tabIndex={-1}
+        >
           <div className="help-head">
             <h2 className="help-title" id="help-title">
               How it works
@@ -151,8 +157,10 @@ export default function HelpButton() {
                 >
                   {current.art(open)}
                 </div>
-                <h3 className="help-step-title">{current.title}</h3>
-                <p className="help-text">{current.body}</p>
+                <div className="help-copy">
+                  <h3 className="help-step-title">{current.title}</h3>
+                  <p className="help-text">{current.body}</p>
+                </div>
               </div>
             )}
           </div>
@@ -168,7 +176,7 @@ export default function HelpButton() {
               <Chevron direction="left" />
             </button>
             <span className="help-count">
-              {step + 1} of {STEPS.length}
+              {step + 1} / {STEPS.length}
             </span>
             {isLast ? (
               <button
