@@ -69,7 +69,11 @@ export default function Leaf({
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const rotDeg = (rot * 180) / Math.PI;
 
-  const { refs, floatingStyles, context } = useFloating({
+  const {
+    refs: { setReference, setFloating, setPositionReference },
+    floatingStyles,
+    context,
+  } = useFloating({
     open: tooltipOpen,
     onOpenChange: setTooltipOpen,
     placement: "top",
@@ -87,7 +91,7 @@ export default function Leaf({
   ]);
 
   const handleMouseMove = (event) => {
-    refs.setPositionReference({
+    setPositionReference({
       getBoundingClientRect() {
         return {
           x: event.clientX,
@@ -106,7 +110,7 @@ export default function Leaf({
   return (
     <>
       <g
-        ref={refs.setReference}
+        ref={setReference}
         {...getReferenceProps({
           onMouseEnter: () => onHoverChange?.(true),
           onMouseLeave: () => onHoverChange?.(false),
@@ -129,7 +133,7 @@ export default function Leaf({
       {tooltipOpen && tooltipLabel && (
         <FloatingPortal>
           <div
-            ref={refs.setFloating}
+            ref={setFloating}
             style={floatingStyles}
             {...getFloatingProps()}
             className="leaf-tooltip"

@@ -12,10 +12,8 @@ const CATEGORY_FIELDS = ["mass", "adoration", "rosary", "fasting"];
 
 async function checkRateLimit(ip) {
   const key = `ratelimit:${ip}`;
+  await kv.set(key, 0, { ex: RATE_LIMIT_WINDOW_SECONDS, nx: true });
   const count = await kv.incr(key);
-  if (count === 1) {
-    await kv.expire(key, RATE_LIMIT_WINDOW_SECONDS);
-  }
   return count <= RATE_LIMIT_MAX_REQUESTS;
 }
 

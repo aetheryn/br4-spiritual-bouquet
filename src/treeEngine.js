@@ -212,11 +212,10 @@ export function generateTree(rng, W, H, phase, isMobile) {
   const trunkBaseW = W * 0.13 * treeScale,
     trunkTopW = W * 0.088 * treeScale;
   const segs = 9;
-  let cx = baseX;
   for (let s = 0; s <= segs; s++) {
     const t = s / segs;
     const wobble = Math.sin(t * Math.PI * 1.0 + 0.3) * W * 0.01 * treeScale;
-    cx = baseX + wobble + (s ? (rng() - 0.5) * W * 0.003 * treeScale : 0);
+    const cx = baseX + wobble + (s ? (rng() - 0.5) * W * 0.003 * treeScale : 0);
     const yy = baseY - t * (baseY - crotchY);
     trunkPts.push({ x: cx, y: yy });
     trunkWidths.push(trunkBaseW * (1 - t) + trunkTopW * t);
