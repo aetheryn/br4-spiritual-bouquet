@@ -64,29 +64,33 @@ export const CATS = [
   {
     id: "masses",
     label: "Masses",
+    shortName: "Masses",
     singular: "Mass",
-    plural: "Masses",
+    description: "Each Mass you attend, weekday or weekend.",
     color: "#d7a05f",
   },
   {
     id: "rosaries",
     label: "Rosaries",
+    shortName: "Rosaries",
     singular: "Rosary",
-    plural: "Rosaries",
+    description: "A rosary prayed alone or with others.",
     color: "#b9965c",
   },
   {
     id: "adoration",
     label: "Half-Hour of Adoration",
+    shortName: "Adoration",
     singular: "Half-Hour of Adoration",
-    plural: "Half-Hours of Adoration",
+    description: "Thirty quiet minutes before the Blessed Sacrament.",
     color: "#b8b05d",
   },
   {
     id: "fasting",
     label: "Day of Fasting",
+    shortName: "Fasting",
     singular: "Day of Fasting",
-    plural: "Days of Fasting",
+    description: "A day of fasting, offered for the retreat.",
     color: "#7f933a",
   },
 ].map((c) => ({ ...c, darkColor: darkenHex(c.color, 0.35) }));
@@ -127,11 +131,10 @@ export function fillTaperedPath(ctx, pts, widths, color) {
   ctx.fill();
 }
 
-// Full Bloom's own numbers, hardcoded — the phase system arrives in a later step.
+// A phase applies while the running total is at or below its maxTotal.
 
 export const TREE_PHASES = [
   {
-    name: "Sapling",
     maxTotal: 24,
     treeScale: 0.22,
     maxDepth: 2,
@@ -140,7 +143,6 @@ export const TREE_PHASES = [
     leafScaleRange: [0.4, 0.6],
   },
   {
-    name: "Small Sprout",
     maxTotal: 49,
     treeScale: 0.33,
     maxDepth: 2,
@@ -149,7 +151,6 @@ export const TREE_PHASES = [
     leafScaleRange: [0.5, 0.7],
   },
   {
-    name: "Young Tree",
     maxTotal: 99,
     treeScale: 0.45,
     maxDepth: 3,
@@ -157,7 +158,6 @@ export const TREE_PHASES = [
     primaryN: (rng) => 3 + Math.floor(rng() * 2),
   },
   {
-    name: "Mature Tree",
     maxTotal: 199,
     treeScale: 0.56,
     maxDepth: 3,
@@ -165,7 +165,6 @@ export const TREE_PHASES = [
     primaryN: (rng) => 4 + Math.floor(rng() * 2),
   },
   {
-    name: "Full Bloom",
     maxTotal: Infinity,
     treeScale: 0.645,
     maxDepth: 4,
@@ -181,12 +180,11 @@ export function phaseProgress(total) {
   const index = phaseIndexForTotal(total);
   const phase = TREE_PHASES[index];
   const next = TREE_PHASES[index + 1];
-  if (!next) return { phase, next: null, remaining: 0, fraction: 1 };
+  if (!next) return { next: null, remaining: 0, fraction: 1 };
 
   const start = index === 0 ? 0 : TREE_PHASES[index - 1].maxTotal + 1;
   const end = phase.maxTotal + 1;
   return {
-    phase,
     next,
     remaining: end - total,
     fraction: (total - start) / (end - start),
