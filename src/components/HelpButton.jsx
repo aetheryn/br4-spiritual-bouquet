@@ -7,7 +7,9 @@ const STEPS = [
     title: "One shared tree",
     body: "Every prayer offered at Breathe #4 becomes a leaf on this tree. The more we offer together, the more it grows.",
     decorative: true,
-    art: (running) => <GrowingTreeArt running={running} />,
+    // The tree is the only heavy picture, so it is only built while it is shown.
+    art: (active, running) =>
+      active ? <GrowingTreeArt running={running} /> : null,
   },
   {
     title: "Four kinds of prayer",
@@ -145,23 +147,48 @@ export default function HelpButton() {
 
           <div
             className="help-body"
-            aria-live="polite"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
             {hasOpened && (
-              <div className="help-step" key={step}>
-                <div
-                  className="help-art"
-                  aria-hidden={current.decorative ? "true" : undefined}
-                >
-                  {current.art(open)}
+              <>
+                <p className="help-sr-only" aria-live="polite">
+                  Step {step + 1} of {STEPS.length}: {current.title}
+                </p>
+
+                {/* All steps share one grid cell (see .help-arts in the CSS),
+                    so the panel is as tall as the tallest one on every step. */}
+                <div className="help-arts">
+                  {STEPS.map((s, i) => (
+                    <div
+                      key={s.title}
+                      className={
+                        i === step
+                          ? "help-item help-art active"
+                          : "help-item help-art"
+                      }
+                      inert={i !== step}
+                      aria-hidden={i !== step || s.decorative}
+                    >
+                      {s.art(i === step, open)}
+                    </div>
+                  ))}
                 </div>
-                <div className="help-copy">
-                  <h3 className="help-step-title">{current.title}</h3>
-                  <p className="help-text">{current.body}</p>
+
+                <div className="help-copies">
+                  {STEPS.map((s, i) => (
+                    <div
+                      key={s.title}
+                      className={i === step ? "help-item active" : "help-item"}
+                      inert={i !== step}
+                      aria-hidden={i !== step}
+                    >
+                      <h3 className="help-step-title">{s.title}</h3>
+                      <p className="help-text">{s.body}</p>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              </>
             )}
           </div>
 

@@ -548,8 +548,32 @@ html.scroll-locked {
   padding: 0 22px;
 }
 
-.help-step {
-  animation: help-step-in 220ms ease both;
+/* The four steps share one grid cell and only one is shown at a time, so the
+   panel is always as tall as the tallest step instead of resizing per step. */
+.help-arts,
+.help-copies {
+  display: grid;
+}
+
+.help-arts > *,
+.help-copies > * {
+  grid-area: 1 / 1;
+}
+
+.help-item {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.help-item.active {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .help-item.active {
+    animation: help-step-in 220ms ease both;
+  }
 }
 
 @keyframes help-step-in {
@@ -567,6 +591,18 @@ html.scroll-locked {
   justify-content: center;
 }
 
+.help-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .help-art-tree {
   position: absolute;
   inset: 0;
@@ -577,10 +613,6 @@ html.scroll-locked {
 .help-art-shield {
   position: absolute;
   inset: 0;
-}
-
-.help-copy {
-  min-height: 9.4rem;
 }
 
 .help-step-title {
@@ -797,10 +829,35 @@ html.scroll-locked {
   transform: translateX(-50%);
 }
 
-/* Short portrait screens: a smaller picture so the words still fit. */
+/* Short portrait screens: a smaller picture, and no descriptions in step 2,
+   so the tallest step still fits without scrolling. */
 @media (orientation: portrait) and (max-height: 620px) {
   .help-panel {
-    --help-art-h: 240px;
+    --help-art-h: 228px;
+  }
+
+  .help-specimens .cat-desc {
+    display: none;
+  }
+
+  .help-screen {
+    zoom: 0.9;
+  }
+}
+
+/* Very short screens (a small square window): shrink the pictures further. */
+@media (orientation: portrait) and (max-height: 520px) {
+  .help-panel {
+    --help-art-h: 170px;
+  }
+
+  .help-screen {
+    zoom: 0.7;
+  }
+
+  .help-specimen-leaf {
+    width: 40px;
+    height: 40px;
   }
 }
 
@@ -812,7 +869,7 @@ html.scroll-locked {
     height: calc(100dvh - 32px);
   }
 
-  .help-step {
+  .help-body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
@@ -823,16 +880,30 @@ html.scroll-locked {
     margin-top: 0;
   }
 
-  .help-copy {
-    min-height: 0;
-  }
-
   .help-step-title {
     margin-top: 0;
   }
 
   .help-screen {
     zoom: 0.8;
+  }
+
+  .help-specimens {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .help-specimens .cat-desc {
+    display: none;
+  }
+
+  .help-specimen-leaf {
+    width: 48px;
+    height: 48px;
+  }
+
+  .help-specimens .cat-name {
+    font-size: 0.8rem;
   }
 }
 
