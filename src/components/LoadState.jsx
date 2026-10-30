@@ -1,3 +1,5 @@
+import Sprout from "./Sprout";
+
 export default function LoadState({ error, onRetry }) {
   if (error) {
     return (
@@ -13,7 +15,10 @@ export default function LoadState({ error, onRetry }) {
 
   return (
     <div className="status" role="status">
-      <p className="status-title">Gathering the bouquet…</p>
+      <Sprout />
+      <p className="status-title status-title-loading">
+        Gathering the bouquet…
+      </p>
     </div>
   );
 }
