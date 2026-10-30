@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import Sprout from "./Sprout";
 import { lockScroll } from "../scrollLock";
 
-const SUCCESS_MS = 2800;
+const SUCCESS_MS = 2000;
 
 // Covers the whole screen while an offering is sent, then turns into the
 // thank-you and closes itself. `phase` and the details stay as they were while

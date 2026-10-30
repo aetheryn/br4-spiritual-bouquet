@@ -16,7 +16,7 @@ const MAX_NAME_LENGTH = 60; // mirrors MAX_NAME_LENGTH in api/prayers.js
 const DISMISS_DRAG_PX = 100;
 const FLICK_VELOCITY = 0.6; // px per ms
 const FLICK_MIN_PX = 40;
-const MIN_LOADING_MS = 1200; // keep the loading state from flashing past
+const MIN_LOADING_MS = 800; // keep the loading state from flashing past
 
 export default function OfferDrawer({ onSubmitted }) {
   const [open, setOpen] = useState(false);
